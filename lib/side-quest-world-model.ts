@@ -166,8 +166,6 @@ function* buildSideQuestWorldSteps(scene:THREE.Scene) {
     const x=-3.55+i*1.17;
     windowFrame(tram,x,2.94,-1.2,.99,1.36);
   }
-  const rearAd=label(tram,"build cool shit",4.5,.42,0,1.39,-1.249);rearAd.rotation.y=Math.PI;
-  for(const x of [-3.35,3.35]){box(tram,1.22,.34,.025,x,1.39,-1.254,cream,.025);}
   // Cab with three glazed panels and a round, lit headlamp.
   yield;
   for(const x of [-3.75,-2.68]){
@@ -362,7 +360,6 @@ function* buildSideQuestWorldSteps(scene:THREE.Scene) {
   // Back platform has luggage, route signage, bicycle and a small bird bath.
   yield;
   const back=group("Back platform / waiting for the next adventure",0,.1,-2.8);
-  label(back,"end of the line, or maybe the start?",3.7,.35,0,.7,-.27).rotation.y=Math.PI;
   for(const x of [-1.7,1.7])rod(back,[x,.02,-.25],[x,.95,-.25],.035,dark);
   for(let i=0;i<3;i++){
     const suitcase=box(back,.66,.5,.32,2.4+i*.15,.28+i*.5,0,i%2?red:navy,.07);suitcase.rotation.y=i*.14;
