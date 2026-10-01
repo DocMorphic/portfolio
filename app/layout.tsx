@@ -82,7 +82,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('os-folio:theme')||'light';var a=localStorage.getItem('os-folio:accent')||'green';var b=localStorage.getItem('os-folio:brightness')||'100';document.documentElement.setAttribute('data-theme',t);document.documentElement.setAttribute('data-accent',a);document.documentElement.style.setProperty('--display-brightness',(parseInt(b,10)/100).toString())}catch(e){}})()`,
+            __html: `(function(){try{var t=localStorage.getItem('portfolio:theme')||'light';var a=localStorage.getItem('portfolio:accent')||'green';var b=localStorage.getItem('portfolio:brightness')||'100';document.documentElement.setAttribute('data-theme',t);document.documentElement.setAttribute('data-accent',a);document.documentElement.style.setProperty('--display-brightness',(parseInt(b,10)/100).toString())}catch(e){}})()`,
           }}
         />
       </head>

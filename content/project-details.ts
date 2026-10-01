@@ -225,8 +225,8 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
     },
   },
 
-  "os-folio": {
-    projectId: "os-folio",
+  portfolio: {
+    projectId: "portfolio",
     tasks: ["Product Design", "Frontend", "Window Management", "Analytics"],
     sections: [
       {
@@ -257,7 +257,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       ],
     },
     references: [
-      { label: "GitHub", href: "https://github.com/DocMorphic/os-folio" },
+      { label: "GitHub", href: "https://github.com/DocMorphic/portfolio" },
     ],
   },
 };

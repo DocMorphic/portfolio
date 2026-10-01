@@ -55,8 +55,8 @@ export const projects: Project[] = [
     endDate: "Now",
   },
   {
-    id: "os-folio",
-    title: "OS Portfolio",
+    id: "portfolio",
+    title: "Portfolio",
     description:
       "This site. A desktop-OS-style portfolio with draggable windows, a working terminal, file explorer, site stats dashboard, and full theming. Built with Next.js 16, React 19, Tailwind 4, and a Supabase analytics backend.",
     tags: ["Next.js", "React", "TypeScript", "Tailwind", "Supabase"],
@@ -65,7 +65,7 @@ export const projects: Project[] = [
     year: "2026",
     startDate: "May 2026",
     endDate: "Now",
-    github: "https://github.com/DocMorphic/os-folio",
+    github: "https://github.com/DocMorphic/portfolio",
   },
   {
     id: "pyra",

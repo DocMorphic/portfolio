@@ -10,7 +10,7 @@ const CMD_KEY = typeof navigator !== "undefined" && /Mac/.test(navigator.platfor
 
 function resetSystem() {
   try {
-    const keys = Object.keys(localStorage).filter((k) => k.startsWith("os-folio:"));
+    const keys = Object.keys(localStorage).filter((k) => k.startsWith("portfolio:"));
     keys.forEach((k) => localStorage.removeItem(k));
   } catch {}
   window.location.reload();

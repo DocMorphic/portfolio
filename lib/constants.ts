@@ -1,6 +1,6 @@
 import type { AppDefinition } from "./types";
 
-export const STORAGE_PREFIX = "os-folio";
+export const STORAGE_PREFIX = "portfolio";
 
 export const STORAGE_KEYS = {
   theme: `${STORAGE_PREFIX}:theme`,

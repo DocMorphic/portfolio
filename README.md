@@ -1,9 +1,9 @@
-<p align="center"><img src="docs/assets/cover.svg" alt="os-folio — a portfolio you can open, move around, and explore." width="100%" /></p>
-<p align="center"><a href="https://os-folio.vercel.app/">Explore the desktop</a> · <a href="docs/SETUP.md">Setup & customization</a> · <a href="docs/ARCHITECTURE.md">How it works</a></p>
+<p align="center"><img src="docs/assets/cover.svg" alt="Dharmay Dave's portfolio — a desktop you can open, move around, and explore." width="100%" /></p>
+<p align="center"><a href="https://dharmaydave.com/">Explore the desktop</a> · <a href="docs/SETUP.md">Setup & customization</a> · <a href="docs/ARCHITECTURE.md">How it works</a></p>
 
 # A portfolio that feels like a personal computer
 
-**os-folio is Dharmay Dave's portfolio, built as a windowed desktop.** Open projects like applications, browse photographs like folders, read notes in a text editor, or explore through a terminal. The interface is part of the work.
+**This is Dharmay Dave's portfolio, built as a windowed desktop.** Open projects like applications, browse photographs like folders, read notes in a text editor, or explore through a terminal. The interface is part of the work.
 
 Built with **Next.js 16, React 19, TypeScript, and Tailwind CSS 4**.
 
@@ -42,8 +42,8 @@ The content is separate from the window system. Most changes to projects, experi
 Use Node.js **20.9 or newer** and npm.
 
 ```sh
-git clone https://github.com/DocMorphic/os-folio.git
-cd os-folio
+git clone https://github.com/DocMorphic/portfolio.git
+cd portfolio
 npm ci
 npm run dev
 ```

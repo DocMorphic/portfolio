@@ -1,4 +1,4 @@
-# os-folio — Claude session brief
+# Portfolio — Claude session brief
 
 A condensed onboarding for a Claude Code session starting work in this repo. Read this once before touching code. The standing `AGENTS.md` rule still applies on top.
 
@@ -8,7 +8,7 @@ A personal portfolio site with a **"desktop OS" UI metaphor** — a wallpaper, a
 
 - **Stack:** Next.js 16 (App Router) · React 19 · Tailwind v4 · TypeScript
 - **Backend:** 4 Next route handlers (`app/api/{blogs,contact,fetch-title,stats}/route.ts`) backed by file stores in `lib/`. No DB, no auth.
-- **Remote:** `github.com/DocMorphic/os-folio.git` · current branch: `main`
+- **Remote:** `github.com/DocMorphic/portfolio.git` · current branch: `main`
 
 ## Hard rules — read before writing any code
 

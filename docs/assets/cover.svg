@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" role="img" aria-labelledby="title desc">
-<title id="title">os-folio — A portfolio with windows to open.</title>
+<title id="title">Dharmay Dave's portfolio — A desktop with windows to open.</title>
 <desc id="desc">Projects, photographs, notes. A little room on the web. Original illustrative artwork, not an application screenshot or measured result.</desc>
 <defs><pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#767363" stroke-opacity=".08"/></pattern></defs>
 <rect width="1200" height="440" rx="24" fill="#eee9dd"/><rect width="1200" height="440" rx="24" fill="url(#grid)"/>
 <path d="M704 40V400" stroke="#767363" stroke-opacity=".25"/>
 <g font-family="Arial, Helvetica, sans-serif" fill="#302e25">
 <text x="52" y="58" font-size="12" letter-spacing="3" fill="#767363">DHARMAY DAVE / PERSONAL DESKTOP</text>
-<text x="48" y="182" font-family="Georgia, serif" font-size="104" font-style="italic" letter-spacing="-5">os-folio</text>
+<text x="48" y="182" font-family="Georgia, serif" font-size="104" font-style="italic" letter-spacing="-5">portfolio</text>
 <text x="54" y="243" font-size="25">A portfolio with windows to open.</text>
 <text x="54" y="279" font-size="16" fill="#767363">Projects, photographs, notes. A little room on the web.</text>
 <path d="M54 322H650" stroke="#767363" stroke-opacity=".35"/>

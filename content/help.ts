@@ -1,5 +1,5 @@
 export const helpContent = {
-  title: "Welcome to OS-Folio",
+  title: "Welcome to Dharmay's Portfolio",
   sections: [
     {
       heading: "Getting Around",

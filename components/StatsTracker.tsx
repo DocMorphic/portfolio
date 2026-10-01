@@ -5,11 +5,11 @@ import { useEffect } from "react";
 // Persistent browser-scoped visitor ID. Lives in localStorage so a given
 // device maps to the same UUID across tabs, refreshes, and days — which
 // is what "unique visitor" actually means in analytics land.
-const VISITOR_KEY = "os-folio:visitor-id";
+const VISITOR_KEY = "portfolio:visitor-id";
 // Records the YYYY-MM-DD we last tracked for this device. Skip tracking
 // again if the date already matches today. Net effect: 1 page view per
 // visitor per day. Refresh in the same tab → no dupe. Next day → counted.
-const TRACKED_DATE_KEY = "os-folio:tracked-date";
+const TRACKED_DATE_KEY = "portfolio:tracked-date";
 
 function getOrCreateVisitorId(): string {
   if (typeof window === "undefined") return "";

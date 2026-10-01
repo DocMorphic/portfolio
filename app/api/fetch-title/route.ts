@@ -109,7 +109,7 @@ export async function POST(req: Request) {
       method: "GET",
       signal: controller.signal,
       headers: {
-        "User-Agent": "os-folio-bot/1.0 (+https://github.com/DocMorphic/os-folio)",
+        "User-Agent": "dharmay-portfolio-bot/1.0 (+https://github.com/DocMorphic/portfolio)",
         Accept: "text/html,application/xhtml+xml",
       },
       redirect: "follow",

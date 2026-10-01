@@ -112,7 +112,7 @@ const HANG_FIGURES = [
 // rendered aspect ratio in monospace feels closer to square.
 const SNAKE_COLS = 20;
 const SNAKE_ROWS = 12;
-const SNAKE_BEST_KEY = "os-folio:snake-best";
+const SNAKE_BEST_KEY = "portfolio:snake-best";
 
 type GameMode = "idle" | "snake";
 type Dir = SnakeDirection;
@@ -788,10 +788,10 @@ export function TerminalApp() {
         case "neofetch":
           newLines.push({ type: "output", text: "" });
           newLines.push({ type: "orange", text: "  ┌─────────────────────┐" });
-          newLines.push({ type: "orange", text: "  │   OS-FOLIO v1.2     │" });
+          newLines.push({ type: "orange", text: "  │   PORTFOLIO v1.2    │" });
           newLines.push({ type: "orange", text: "  └─────────────────────┘" });
           newLines.push({ type: "output", text: "  User:    dharmay" });
-          newLines.push({ type: "output", text: "  OS:      os-folio" });
+          newLines.push({ type: "output", text: "  OS:      portfolio" });
           newLines.push({ type: "output", text: "  Shell:   portfolio-terminal" });
           newLines.push({ type: "output", text: "  Engine:  Next.js + React 19" });
           newLines.push({ type: "output", text: "  Theme:   Tailwind CSS 4" });
