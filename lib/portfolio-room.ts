@@ -31,6 +31,8 @@ export type RoomControls = { switchArcade():void; prepare():Promise<void>; setAc
 
 export async function createPortfolioRoom(host:HTMLElement,surface:HTMLElement,onView:(view:RoomView)=>void,onLost:()=>void,onStop?:(stop:WorldSelection|null)=>void,onNight?:(night:boolean)=>void,tvSurface?:HTMLElement,vendingSurface?:HTMLElement,tickerSurface?:HTMLElement):Promise<RoomControls> {
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"});
+  // Include the water's nested reflection render in draw-call diagnostics.
+  renderer.info.autoReset=false;
   renderer.setPixelRatio(worldFramePolicy(false,window.devicePixelRatio).pixelRatio);
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;renderer.localClippingEnabled=true;
@@ -52,6 +54,13 @@ export async function createPortfolioRoom(host:HTMLElement,surface:HTMLElement,o
   await yieldLoadingWork();
   const lettering=createWaterLettering(scene);
   const shopSign=createTramShopSign(scene,materials);
+  // Zero-intensity lights still enlarge Three's lighting shaders. Keep the
+  // nocturnal lamps out of the daytime shader and warm both variants below.
+  const nightLights:THREE.Light[]=[...station.lights,...station.accents,rooftop.wash];
+  shopSign.root.traverse(object=>{if(object instanceof THREE.Light)nightLights.push(object);});
+  let nightLightsVisible=false;
+  const showNightLights=(visible:boolean)=>{nightLightsVisible=visible;nightLights.forEach(light=>{light.visible=visible;});};
+  showNightLights(false);
   // A small, cached environment capture gives the solar glass real sky/terrain
   // reflections. It is not another reflection pass on every animation frame.
   const roofEnvironment=new THREE.WebGLCubeRenderTarget(128,{generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter});
@@ -111,7 +120,8 @@ export async function createPortfolioRoom(host:HTMLElement,surface:HTMLElement,o
   let width=1,height=1,displayWidth=1,displayHeight=1,view:RoomView="terminal",frame=0,previous=0,disposed=false,active=false,preparing=false;
   let ambientTimer:ReturnType<typeof setTimeout>|undefined,lastReflection=-Infinity;
   let orbitMotionUntil=0,orbitHeld=false;
-  let sampleStart=0,sampleFrames=0,sampleWork=0,lastDisplayDraw=-Infinity;
+  let sampleStart=0,sampleFrames=0,sampleWork=0,sampleReflectionRenders=0,lastDisplayDraw=-Infinity,lastDvdDraw=-Infinity,birdReduced=reduced.matches;
+  const movingFrameGaps:number[]=[];
   let mailOpen=false;
   let objectSection:TerminalSection="work";
   let entranceHeld=false;
@@ -312,7 +322,9 @@ export async function createPortfolioRoom(host:HTMLElement,surface:HTMLElement,o
     const cameraActive=!!travel||view==="room"&&(zoomMotion.active||orbitHeld||now<orbitMotionUntil);
     const budget=worldFramePolicy(cameraActive,window.devicePixelRatio);
     if(renderer.getPixelRatio()!==budget.pixelRatio){renderer.setPixelRatio(budget.pixelRatio);life.setSteamViewport(renderer.domElement.height);}
-    const dt=previous?Math.min((now-previous)/1000,.05):1/60;previous=now;
+    const frameGap=previous?now-previous:0;
+    if(cameraActive&&frameGap>0&&frameGap<150)movingFrameGaps.push(frameGap);
+    const dt=previous?Math.min(frameGap/1000,.05):1/60;previous=now;
     const nightMoving=Math.abs(Number(night)-nightAmount)>.001;
     if(nightMoving){
       nightAmount=reduced.matches?Number(night):THREE.MathUtils.damp(nightAmount,Number(night),3,dt);
@@ -322,6 +334,7 @@ export async function createPortfolioRoom(host:HTMLElement,surface:HTMLElement,o
     }
     station.update(nightAmount,reduced.matches?0:dt);
     rooftop.update(nightAmount);shopSign.update(nightAmount);lettering.update(now/1000,nightAmount,reduced.matches);
+    if(nightLightsVisible!==(nightAmount>.001)){showNightLights(nightAmount>.001);renderer.shadowMap.needsUpdate=true;}
     if(environmentNight>=0&&!environmentPending&&Math.abs(nightAmount-Number(night))<.001&&environmentNight!==Number(night))void captureRoofEnvironment(Number(night));
     const windowsMoving=tramWindows.update(dt,reduced.matches);
     if(windowsMoving)renderer.shadowMap.needsUpdate=true;
@@ -364,7 +377,8 @@ export async function createPortfolioRoom(host:HTMLElement,surface:HTMLElement,o
     const redrawDisplays=now-lastDisplayDraw>=1000/30;
     if(redrawDisplays){
     lastDisplayDraw=now;
-    if(view!=="terminal"){drawTramDVD(computer.ctx,reduced.matches?0:now/1000,computer.logoInk);computer.screenTexture.needsUpdate=true;}
+    const dvdInterval=camera.position.distanceTo(screenCenter)<10?1000/30:1000/12;
+    if(view!=="terminal"&&camera.position.z>screenCenter.z&&now-lastDvdDraw>=dvdInterval){lastDvdDraw=now;drawTramDVD(computer.ctx,reduced.matches?0:now/1000,computer.logoInk);computer.screenTexture.needsUpdate=true;}
     // The attract loop keeps playing at every camera distance. Only audio is
     // focus-gated; never freeze the cabinet in the world overview.
     if(!reduced.matches){
@@ -373,21 +387,30 @@ export async function createPortfolioRoom(host:HTMLElement,surface:HTMLElement,o
     }
     }
     const living=!reduced.matches&&view!=="terminal";
-    birds.update(living?dt:0,nightAmount,reduced.matches);
+    if(living||nightMoving||birdReduced!==reduced.matches)birds.update(living?dt:0,nightAmount,reduced.matches);
+    birdReduced=reduced.matches;
     if(living){life.update(now/1000,nightAmount);animateGarden(now/1000);animateMailbox(now/1000,mailOpen);}
     else if(reduced.matches)life.update(0,nightAmount);
-    if(living)fish.update(now/1000,nightAmount);
+    if(living&&fish.active)fish.update(now/1000,nightAmount);
     const reflectionChanged=windowsMoving||living&&now-lastReflection>65;
     if(reflectionChanged)lastReflection=now;
     if(now-soundTime>100){
       const speed=soundTime?Math.min(1,camera.position.distanceTo(soundPosition)/(Math.max(.1,(now-soundTime)/1000)*25)):0;
       worldSound.update(camera.position.distanceTo(screenCenter),speed,nightAmount,view==="terminal"||view==="tv");soundPosition.copy(camera.position);soundTime=now;
     }
+    renderer.info.reset();
     water.update(reduced.matches?0:now/1000,reflectionChanged,reduced.matches?0:dt);camera.updateMatrixWorld();renderer.render(scene,camera);projectSurface();
     const workMs=performance.now()-workStart;
     host.dataset.quality="high";
     sampleStart ||= now;sampleFrames++;sampleWork+=workMs;
-    if(now-sampleStart>1000){host.dataset.fishActive=String(fish.active);host.dataset.drawCalls=String(renderer.info.render.calls);host.dataset.triangles=String(renderer.info.render.triangles);host.dataset.camera=camera.position.toArray().map(n=>n.toFixed(3)).join(",");host.dataset.pixelRatio=String(renderer.getPixelRatio());host.dataset.renderMs=(sampleWork/sampleFrames).toFixed(2);host.dataset.fps=(sampleFrames*1000/(now-sampleStart)).toFixed(1);sampleStart=now;sampleFrames=0;sampleWork=0;}
+    if(now-sampleStart>1000){
+      host.dataset.fishActive=String(fish.active);host.dataset.drawCalls=String(renderer.info.render.calls);host.dataset.triangles=String(renderer.info.render.triangles);
+      host.dataset.camera=camera.position.toArray().map(n=>n.toFixed(3)).join(",");host.dataset.pixelRatio=String(renderer.getPixelRatio());
+      host.dataset.renderMs=(sampleWork/sampleFrames).toFixed(2);host.dataset.fps=(sampleFrames*1000/(now-sampleStart)).toFixed(1);
+      host.dataset.reflectionPasses=String(water.reflectionRenders-sampleReflectionRenders);sampleReflectionRenders=water.reflectionRenders;
+      if(movingFrameGaps.length){movingFrameGaps.sort((a,b)=>a-b);host.dataset.movingFrameP95=movingFrameGaps[Math.floor((movingFrameGaps.length-1)*.95)].toFixed(1);movingFrameGaps.length=0;}
+      sampleStart=now;sampleFrames=0;sampleWork=0;
+    }
     // The timeout is followed by requestAnimationFrame: 16 ms here yields ~30
     // ambient frames/s, whereas 33 ms plus RAF was unintentionally ~20 fps.
     host.dataset.hologram=life.hologramActive?"rebuilding":"formed";
@@ -438,15 +461,18 @@ export async function createPortfolioRoom(host:HTMLElement,surface:HTMLElement,o
   const observer=new ResizeObserver(resize);observer.observe(host);
   const visibility=()=>{previous=0;if(document.hidden){cancel();cancelAnimationFrame(frame);clearTimeout(ambientTimer);frame=0;}else invalidate();};document.addEventListener("visibilitychange",visibility);
   const lost=(event:Event)=>{event.preventDefault();cancelAnimationFrame(frame);frame=0;onLost();};renderer.domElement.addEventListener("webglcontextlost",lost);resize();
-  void photosReady.then(()=>{if(!disposed){lastReflection=-Infinity;invalidate();}});
   return {switchArcade,prepare:async()=>{
     // Do not start the render loop while texture uploads/shaders are warming.
-    resize();await Promise.all([landscape.ready,lettering.ready,shopSign.ready]);if(disposed)return;
+    resize();await Promise.all([landscape.ready,lettering.ready,shopSign.ready,photosReady]);if(disposed)return;
     await warmWorldTextures(renderer,scene,()=>disposed);if(disposed)return;
     // Compile BEFORE the first cube face, not after six blocking scene draws.
     await renderer.compileAsync(scene,camera);if(disposed)return;
     await captureRoofEnvironment(0);if(disposed)return;
-    await renderer.compileAsync(scene,camera);await yieldLoadingWork();
+    await renderer.compileAsync(scene,camera);if(disposed)return;
+    // Avoid compiling the extra point/spot-light variant on the first night toggle.
+    try{showNightLights(true);await renderer.compileAsync(scene,camera);}
+    finally{showNightLights(false);}
+    await yieldLoadingWork();
     if(!disposed){preparing=true;render(performance.now());preparing=false;}
   },setActive:(next)=>{
     active=next;previous=0;if(!next)mailOpen=false;

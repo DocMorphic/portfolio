@@ -3,6 +3,7 @@ import { Reflector } from "three/addons/objects/Reflector.js";
 import { createWaterRipples } from "./water-ripples";
 import { WaterInteraction, RIPPLE_DOMAIN, RIPPLE_RESOLUTION } from "./water-interaction";
 import { shorelineShader, DEFAULT_SHORELINE } from "./lake-shoreline.mjs";
+import { WaterReflectionBudget } from "./water-reflection-budget";
 
 /** One small planar reflection target, shared by the entire water surface. */
 export function createWorldWater(scene:THREE.Scene,screen:THREE.Mesh,screenMaterial:THREE.Material|THREE.Material[],renderer:THREE.WebGLRenderer,otherScreens:{screen:THREE.Mesh;material:THREE.Material|THREE.Material[]}[]=[],shoreline=DEFAULT_SHORELINE){
@@ -20,7 +21,9 @@ export function createWorldWater(scene:THREE.Scene,screen:THREE.Mesh,screenMater
     vec3 stars(vec2 uv,float cells){vec2 p=uv*vec2(cells,cells*.5),cell=floor(p),f=fract(p);float seed=hash(cell),enabled=step(.965,seed);vec2 center=vec2(hash(cell+17.),hash(cell+43.))*.7+.15;float dist=length(f-center),radius=.025+.07*pow(hash(cell+71.),9.);float star=exp(-dist*dist/(radius*radius))*enabled;vec3 tint=mix(vec3(.55,.72,1.),vec3(1.,.82,.57),hash(cell+19.));return tint*star*(.6+pow(seed,30.)*1.2);}
     void main(){vec3 d=normalize(direction);float h=pow(max(d.y,0.),.6);vec3 c=mix(horizon,zenith,clamp(h*1.5,0.,1.));
       float glow=pow(max(dot(d,sun),0.),100.);c+=vec3(.4,.23,.10)*glow;
-      if(d.y>.015){
+      // At full night the daytime cloud result is replaced completely below.
+      // Skip that expensive FBM pass instead of shading it twice per pixel.
+      if(d.y>.015&&night<.999){
         vec2 p=d.xz/(d.y+.16)*2.1+vec2(time*.006,time*.0015);
         float density=cloud(p),body=smoothstep(.43,.69,density);
         float lit=clamp((density-cloud(p+vec2(-.12,.09)))*7.+.56,0.,1.);
@@ -119,19 +122,22 @@ export function createWorldWater(scene:THREE.Scene,screen:THREE.Mesh,screenMater
       #include <colorspace_fragment>}`};
   const water=new Reflector(new THREE.PlaneGeometry(480,480),{textureWidth:1024,textureHeight:1024,multisample:0,clipBias:.0001,shader,color:0xa6c4d2});
   water.name="Water / single planar reflection";water.rotation.x=-Math.PI/2;water.position.y=-.49;scene.add(water);
-  const reflect=water.onBeforeRender,lastView=new THREE.Matrix4(),lastProjection=new THREE.Matrix4();let dirty=true;
+  const reflect=water.onBeforeRender,lastView=new THREE.Matrix4(),lastProjection=new THREE.Matrix4();
+  const reflectionBudget=new WaterReflectionBudget();let dirty=true,reflectionRenders=0;
   water.onBeforeRender=function(renderer,world,camera,geometry,material,group){
-    // Wave phase does not invalidate a static reflected scene. Camera movement
-    // always refreshes both the image and its projective texture matrix.
-    if(!dirty&&lastView.equals(camera.matrixWorld)&&lastProjection.equals(camera.projectionMatrix))return;
+    // Reuse the captured image together with its original projective matrix.
+    // Fast camera frames refresh both; late frames can reuse a recent capture.
+    const lensChanged=!lastProjection.equals(camera.projectionMatrix);
+    const cameraChanged=!lastView.equals(camera.matrixWorld)||lensChanged;
+    if(!reflectionBudget.shouldUpdate(performance.now(),cameraChanged,dirty,lensChanged))return;
     dirty=false;lastView.copy(camera.matrixWorld);lastProjection.copy(camera.projectionMatrix);
     const mask=screen.material;screen.material=screenMaterial;
     // Cross-origin video stays in its official iframe. Reflect the TV glass,
     // not its transparent DOM aperture, so no hole is punched in the water.
     const otherMasks=otherScreens.map(entry=>{const previous=entry.screen.material;entry.screen.material=entry.material;return previous;});
-    try{reflect.call(this,renderer,world,camera,geometry,material,group);}finally{screen.material=mask;otherScreens.forEach((entry,i)=>{entry.screen.material=otherMasks[i];});}
+    try{reflect.call(this,renderer,world,camera,geometry,material,group);reflectionRenders++;}finally{screen.material=mask;otherScreens.forEach((entry,i)=>{entry.screen.material=otherMasks[i];});}
   };
-  return {water,interaction,setNight:(amount:number)=>{skyMaterial.uniforms.night.value=amount;(water.material as THREE.ShaderMaterial).uniforms.night.value=amount;dirty=true;},get isRippling(){return ripples.activity>0;},update:(seconds:number,sceneChanged=false,dt=0)=>{
+  return {water,interaction,get reflectionRenders(){return reflectionRenders;},setNight:(amount:number)=>{skyMaterial.uniforms.night.value=amount;(water.material as THREE.ShaderMaterial).uniforms.night.value=amount;dirty=true;},get isRippling(){return ripples.activity>0;},update:(seconds:number,sceneChanged=false,dt=0)=>{
     dirty ||= sceneChanged;skyMaterial.uniforms.time.value=seconds;
     ripples.step(dt,interaction.drain());const uniforms=(water.material as THREE.ShaderMaterial).uniforms;
     uniforms.time.value=seconds;uniforms.rippleField.value=ripples.texture;uniforms.rippleFade.value=ripples.activity;

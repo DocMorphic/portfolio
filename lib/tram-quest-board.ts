@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {WORLD_ASSETS} from './world-assets.mjs';
 
 /** An original career case board: layered paper, real pinheads and red thread.
  * Inspired by physical detective walls / Alan Wake's clustered case-board layout. */
@@ -162,7 +163,7 @@ export function createQuestBoard(scene:THREE.Scene,materials:THREE.Material[],te
       const grainTexture=new THREE.CanvasTexture(grain);grainTexture.colorSpace=THREE.SRGBColorSpace;grainTexture.anisotropy=8;textures.push(grainTexture);
       for(const material of [wood,edge]){material.map=grainTexture;material.bumpMap=grainTexture;material.bumpScale=.006;material.needsUpdate=true;}
       paintNotes();printTexture.needsUpdate=true;resolve();
-    };image.onerror=()=>resolve();image.src='/assets/case-board-materials.png';
+    };image.onerror=()=>resolve();image.src=WORLD_ASSETS.boardMaterials;
   });
   const loadHandwriting=typeof FontFace==='undefined'?Promise.resolve():new FontFace('Case Notes','url(/fonts/Caveat.ttf)',{weight:'400 700'}).load().then(font=>{
     if(!disposed){document.fonts.add(font);paintNotes();printTexture.needsUpdate=true;}

@@ -39,7 +39,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
   },
   works: {
     id: "works",
-    title: "Works",
+    title: "Projects",
     icon: "🗂️",
     defaultWidth: 1080,
     defaultHeight: 680,

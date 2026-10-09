@@ -33,7 +33,9 @@ export function* batchRoomGeometrySteps(scene:THREE.Scene,protectedRoot:THREE.Ob
     if(dynamic)continue;
     // Nearby batches retain useful raycast bounds instead of one room-sized bound.
     const p=object.getWorldPosition(new THREE.Vector3());
-    const key=[object.material.uuid,object.castShadow,object.receiveShadow,Math.floor(p.x/cellSize),Math.floor(p.z/cellSize)].join(":");
+    // Center the first cell on the tram. An origin-aligned grid needlessly
+    // splits nearly every shared material at x=0 and z=0, multiplying draws.
+    const key=[object.material.uuid,object.castShadow,object.receiveShadow,Math.floor((p.x+cellSize/2)/cellSize),Math.floor((p.z+cellSize/2)/cellSize)].join(":");
     let batch=batches.get(key);
     if(!batch){batch={source:[],geometry:[],material:object.material,cast:object.castShadow,receive:object.receiveShadow};batches.set(key,batch);}
     // Preserve shared vertices. Expanding every bolt/prop to triangle soup

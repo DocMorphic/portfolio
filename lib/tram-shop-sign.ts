@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import {RoundedBoxGeometry} from "three/addons/geometries/RoundedBoxGeometry.js";
+import {WORLD_ASSETS} from "./world-assets.mjs";
 
-export const BILLBOARD={width:4.1,height:4.1/3,y:5.22,x:-.22,z:.46,texture:'/assets/tram-roadside-billboard.png'} as const;
+export const BILLBOARD={width:4.1,height:4.1/3,y:5.22,x:-.22,z:.46,texture:WORLD_ASSETS.billboard} as const;
 
 /** A solid, chipped board. Only its forward cap gets the corresponding paint UVs. */
 export function roadsidePlank(row:number,left:number,right:number){

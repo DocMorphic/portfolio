@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { shorelineRadius, DEFAULT_SHORELINE } from "./lake-shoreline.mjs";
 import {createShoreDetail} from "./shore-detail";
+import {WORLD_ASSETS} from "./world-assets.mjs";
 
 export const TERRAIN_RADII=[76,105,137];
 const TERRAIN_WIDTH=25;
@@ -151,7 +152,7 @@ function mistMaterial(density=.0045,night={value:0}){
   material.customProgramCacheKey=()=>"landscape-height-mist-v4";return material;
 }
 
-export const LANDSCAPE_IMAGES=["/assets/alpine-panorama.png","/assets/wooded-valley.png","/assets/alpine-escarpment.png"];
+export const LANDSCAPE_IMAGES=[WORLD_ASSETS.panorama,WORLD_ASSETS.valley,WORLD_ASSETS.escarpment];
 export const SHORE_PHOTO_HEIGHT=64;
 export const SHORE_RELIEF_ROWS=24;
 export function shoreRelief(height:number,angle:number,radius:number){

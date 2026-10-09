@@ -41,7 +41,7 @@ export function WorksApp() {
       {/* Heading */}
       <div>
         <h1 className="font-serif-heading text-[30px] leading-none" style={{ color: "var(--color-text)" }}>
-          Works
+          Projects
         </h1>
         <p className="mt-3 text-[12.5px] leading-[1.55]" style={{ color: "var(--color-text-secondary)" }}>
           Explore selected projects with timelines, stack choices, and delivery outcomes. This view includes company and freelance examples in a horizontal timeline display.

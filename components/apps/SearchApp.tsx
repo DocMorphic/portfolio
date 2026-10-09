@@ -55,7 +55,7 @@ const INTENTS: SearchIntent[] = [
       "freelance",
     ],
     appId: "works",
-    message: "Opened Works — here's what Dharmay has been building.",
+    message: "Opened Projects — here's what Dharmay has been building.",
   },
   {
     keywords: [

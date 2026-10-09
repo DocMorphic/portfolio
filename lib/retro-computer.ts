@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { buildRetroComputer } from "./retro-computer-model";
 import { dvdPosition, DVD_WIDTH, DVD_HEIGHT } from "./dvd-screensaver";
 import { ComputerSpin } from "./computer-spin";
-import { editCode, findComputerMedia, KEYCAP_REST, KEYCAP_PRESSED, stepKeycap, advanceTerminalCode, TERMINAL_CODE, TERMINAL_HINT_KEYS, keyboardHintsVisible, MAX_CODE_LENGTH, type ComputerView, type KeyFeedback } from "./computer-interactions";
+import { editCode, findComputerMedia, KEYCAP_REST, KEYCAP_PRESSED, stepKeycap, advanceTerminalCode, TERMINAL_CODE, TERMINAL_HINT_KEYS, terminalGuideAt, keyboardHintsVisible, MAX_CODE_LENGTH, type ComputerView, type KeyFeedback } from "./computer-interactions";
 import { computerMedia, type ComputerMedia } from "@/content/computer-media";
 import { convexHull, expandByFootprint, moveMouseWithinScene, type Point, type Bounds } from "./mouse-collision";
 import { mouseDragTarget } from "./mouse-drag";
@@ -48,8 +48,9 @@ export function createComputer(host: HTMLElement, onState: (state: ComputerState
   let pressedObject: THREE.Object3D | null = null;
   let gesture: "spin" | "mouse" | "key" | null = null;
   let gestureStart={x:0,y:0};let gestureMoved=false;
-  let view:ComputerView="overview",entry="",message="Click the keyboard to explore.";
+  let view:ComputerView="overview",entry="",message="Click the orange-lit keyboard, then type TERMINAL to enter the tram world.";
   let accepted="";
+  let guideStart=Infinity;
   const feedback=new Map<string,{kind:KeyFeedback;until:number}>();
   let terminal=false,terminalReady=false;
   let activeMedia:ComputerMedia|undefined;
@@ -90,8 +91,8 @@ export function createComputer(host: HTMLElement, onState: (state: ComputerState
     travel={elapsed:0,from:camera.position.clone(),to,qFrom:camera.quaternion.clone(),qTo:pose.quaternion.clone(),width:viewWidth,yaw:rig.rotation.y};
     spin.reset();notify(message);invalidate();
   };
-  const focusKeyboard=()=>{stopMedia();entry="";accepted="";feedback.clear();focusView("keyboard");notify("Some keys are glowing. Find the sequence. Escape goes back.");};
-  const back=()=>{stopMedia();terminal=false;terminalReady=false;entry="";accepted="";feedback.clear();focusView("overview");notify("Back at the desktop.");};
+  const focusKeyboard=()=>{stopMedia();entry="";accepted="";guideStart=Infinity;feedback.clear();focusView("keyboard");notify("Follow the keys pressing T-E-R-M-I-N-A-L, or type it yourself. Escape goes back.");};
+  const back=()=>{stopMedia();terminal=false;terminalReady=false;entry="";accepted="";guideStart=Infinity;feedback.clear();focusView("overview");notify("Back at the desktop.");};
   const wakeScreen=()=>{resetMouse();if(view==="screen"&&powered)return;if(!powered){powered=true;boot=time;}wake=time;focusView("screen");notify(activeMedia?activeMedia.title:"Welcome to the tiny portfolio.");invalidate();};
   const play=()=>{
     if(!activeMedia)return;
@@ -112,6 +113,7 @@ export function createComputer(host: HTMLElement, onState: (state: ComputerState
   const playPause=()=>{if(media.paused)play();else{stopMedia();notify("Playback paused.");invalidate();}};
   const key=(name:string,pulse=true)=>{
     if(pulse)for(const item of keys)if(item.name===normalizeKey(name))item.pressedUntil=time+0.14;
+    if(view==="keyboard")guideStart=time+0.7;
     if(name==="Esc"||name==="Escape"){back();return;}
     if(terminal)return;
     if(name==="Enter"){
@@ -127,7 +129,7 @@ export function createComputer(host: HTMLElement, onState: (state: ComputerState
     if(accepted===TERMINAL_CODE){
       stopMedia();activeMedia=undefined;terminal=true;terminalReady=false;powered=true;entry="";
       focusView("screen");notify("Sequence accepted. Opening portfolio terminal…");
-    }else notify("Some keys are glowing. Find the sequence.");
+    }else notify("Follow the typing demo, or press the remaining letters yourself.");
     invalidate();
   };
   media.onended=()=>{notify("Playback finished.");invalidate();};
@@ -341,26 +343,32 @@ export function createComputer(host: HTMLElement, onState: (state: ComputerState
       camera.position.lerpVectors(travel.from,travel.to,ease);camera.position.y+=Math.sin(Math.PI*t)*0.25;
       camera.quaternion.slerpQuaternions(travel.qFrom,travel.qTo,ease);
       const aspect=Math.max(0.1,host.clientWidth/Math.max(1,host.clientHeight));
-      const targetWidth=view==="overview"?Math.max(4*aspect,3.9):view==="keyboard"?Math.max(2.75,1.08*aspect):Math.max(2.75,2.5*aspect);
+      const targetWidth=view==="overview"?Math.max(4*aspect,3.9):view==="keyboard"?Math.max(2.75,1.45*aspect):Math.max(2.75,2.5*aspect);
       viewWidth=THREE.MathUtils.lerp(travel.width,targetWidth,ease);
       rig.rotation.y=THREE.MathUtils.lerp(travel.yaw,Math.round(travel.yaw/(Math.PI*2))*Math.PI*2,ease);rig.rotation.x*=1-ease;
-      if(t===1){travel=null;spin.reset();hoverYaw=0;rig.rotation.set(0,0,0);if(terminal){terminalReady=true;notify("Portfolio terminal ready.");}if(pendingPlayback){pendingPlayback=false;play();}}
+      if(t===1){travel=null;spin.reset();hoverYaw=0;rig.rotation.set(0,0,0);if(view==="keyboard")guideStart=time+0.4;if(terminal){terminalReady=true;notify("Portfolio terminal ready.");}if(pendingPlayback){pendingPlayback=false;play();}}
     }
     const aspect=Math.max(0.1,host.clientWidth/Math.max(1,host.clientHeight));
     camera.left=-viewWidth/2;camera.right=viewWidth/2;camera.top=viewWidth/aspect/2;camera.bottom=-viewWidth/aspect/2;camera.updateProjectionMatrix();
+    const hintsVisible=keyboardHintsVisible(view,!!travel,terminal);
+    // Highlight the physical keys even in the miniature overview: the object
+    // itself is the affordance, with no screen-space frame around it.
+    const keyboardAccentVisible=hintsVisible||(view==="overview"&&!travel);
+    const guide=hintsVisible?(reduced.matches?{key:TERMINAL_CODE[accepted.length],pressed:false}:terminalGuideAt(time-guideStart,accepted.length)):null;
     for(const item of keys){
-      const hintsVisible=keyboardHintsVisible(view,!!travel,terminal);
-      const flash=feedback.get(item.name),kind=flash&&flash.until>time?flash.kind:accepted.includes(item.name)?"correct":null;
+      const flash=feedback.get(item.name),kind=flash&&flash.until>time?flash.kind:null;
       const tint=kind==="correct"?0x4ddc83:kind==="misplaced"?0xffd449:kind==="wrong"?0xf14c52:TERMINAL_HINT_KEYS.has(item.name)?0xf08a24:null;
       item.hint.color.copy(item.restColor);item.hint.emissiveIntensity=0;
-      if(hintsVisible&&tint!==null){item.hint.color.set(tint);item.hint.emissive.set(tint);item.hint.emissiveIntensity=kind?.55:reduced.matches?.3:.3+Math.sin(time*2.1)*.09;}
-      const pressed=heldKeys.has(item.name)||item.pressedUntil>time;
+      if(keyboardAccentVisible&&tint!==null){item.hint.color.set(tint);item.hint.emissive.set(tint);item.hint.emissiveIntensity=kind?0.55:guide?.key===item.name?0.9:view==="overview"?0.65:0.35;}
+      const pressed=heldKeys.has(item.name)||item.pressedUntil>time||(guide?.key===item.name&&guide.pressed);
       item.group.position.y=reduced.matches?(pressed?KEYCAP_PRESSED:KEYCAP_REST):stepKeycap(item.group.position.y,pressed,dt);
       maxKeyTravel=Math.max(maxKeyTravel,KEYCAP_REST-item.group.position.y);
     }
     // Aggregate geometry-only diagnostic: never expose the secret or typed keys.
     renderer.domElement.dataset.maxKeyTravel=maxKeyTravel.toFixed(4);
-    renderer.domElement.dataset.hintsVisible=String(keyboardHintsVisible(view,!!travel,terminal));
+    renderer.domElement.dataset.hintsVisible=String(hintsVisible);
+    renderer.domElement.dataset.demoKey=guide?.key??"";
+    renderer.domElement.dataset.demoPressed=String(!!guide?.pressed);
     // Direct manipulation must not trail the pointer or accumulate collision offsets.
     const returnProgress=mouseReturn.step(dt,!!travel,reduced.matches);
     if(returnProgress!==null){
@@ -409,7 +417,7 @@ export function createComputer(host: HTMLElement, onState: (state: ComputerState
     const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(w,h,false);
-    if(!travel)viewWidth=view==="overview"?Math.max(4*w/h,3.9):view==="keyboard"?Math.max(2.75,1.08*w/h):Math.max(2.75,2.5*w/h);
+    if(!travel)viewWidth=view==="overview"?Math.max(4*w/h,3.9):view==="keyboard"?Math.max(2.75,1.45*w/h):Math.max(2.75,2.5*w/h);
     invalidate();
   };
   const observer=new ResizeObserver(resize);observer.observe(host);

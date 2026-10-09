@@ -15,6 +15,19 @@ export function advanceTerminalCode(accepted:string,key:string):{accepted:string
 export function keyboardHintsVisible(view: ComputerView, moving: boolean, terminal: boolean) {
   return view === "keyboard" && !moving && !terminal;
 }
+/** A visual-only typing demo; it never calls advanceTerminalCode or edits input. */
+export function terminalGuideAt(elapsed: number, acceptedLength: number): { key: string; pressed: boolean } | null {
+  if (!Number.isFinite(elapsed) || elapsed < 0) return null;
+  const remaining = TERMINAL_CODE.slice(Math.max(0, acceptedLength));
+  if (!remaining) return null;
+  const beat = 0.62;
+  const activeDuration = remaining.length * beat;
+  const position = elapsed % (activeDuration + 0.9);
+  if (position >= activeDuration) return null;
+  const index = Math.floor(position / beat);
+  const phase = position - index * beat;
+  return { key: remaining[index], pressed: phase >= 0.12 && phase < 0.39 };
+}
 // A rolling suffix lets a visitor recover from a wrong guess without a visible
 // password field. This is an Easter egg, never an authentication boundary.
 export function terminalCodeEntered(value: string) {

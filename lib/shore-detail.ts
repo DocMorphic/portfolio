@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import {mergeGeometries} from "three/addons/utils/BufferGeometryUtils.js";
 import {shorelineRadius,DEFAULT_SHORELINE} from "./lake-shoreline.mjs";
+import {WORLD_ASSETS} from "./world-assets.mjs";
 
-export const SHORE_DETAIL_IMAGE="/assets/shore-forest-detail.png";
+export const SHORE_DETAIL_IMAGE=WORLD_ASSETS.shoreForest;
 
 /** Small curved forest stands, baked into one draw. No camera-facing sprites. */
 export function shoreDetailGeometry(profile=DEFAULT_SHORELINE){
