@@ -166,17 +166,6 @@ function* buildSideQuestWorldSteps(scene:THREE.Scene) {
     const x=-3.55+i*1.17;
     windowFrame(tram,x,2.94,-1.2,.99,1.36);
   }
-  // The rear reads as a lived-in journey wall rather than another slogan:
-  // three framed, dimensional landscape keepsakes above the luggage platform.
-  for(const [i,x] of [-2.1,0,2.1].entries()){
-    const frame=group(`Rear / landscape keepsake ${i+1}`,x,1.42,-2.11);frame.rotation.y=Math.PI;
-    box(frame,1.82,.74,.08,0,0,0,wood,.024);
-    box(frame,1.67,.59,.014,0,0,.05,i===1?navy:cream,.008);
-    const hill=box(frame,.82,.19,.018,-.39,-.14,.066,i===1?lightGreen:stone,.009);hill.rotation.z=.11;
-    const far=box(frame,.85,.17,.018,.31,-.08,.069,i===1?stone:lightGreen,.009);far.rotation.z=-.13;
-    ball(frame,.10,.43,.16,.076,gold);
-    for(const dx of [-.86,.86])for(const dy of [-.35,.35])ball(frame,.018,dx,dy,.047,brass);
-  }
   // Cab with three glazed panels and a round, lit headlamp.
   yield;
   for(const x of [-3.75,-2.68]){
@@ -371,14 +360,6 @@ function* buildSideQuestWorldSteps(scene:THREE.Scene) {
   // Back platform has luggage, route signage, bicycle and a small bird bath.
   yield;
   const back=group("Back platform / waiting for the next adventure",0,.1,-2.8);
-  // A little luggage-and-lantern vignette faces the lake on this side.
-  box(back,3.9,.11,.46,0,.48,-.23,wood,.025);
-  for(const x of [-1.7,1.7])box(back,.11,.45,.11,x,.25,-.23,dark,.018);
-  box(back,.24,.34,.23,-.9,.7,-.22,dark,.025);
-  box(back,.17,.21,.17,-.9,.7,-.22,glow,.025);
-  cyl(back,.16,.045,-.9,.89,-.22,brass);
-  const rolledMap=cyl(back,.065,.68,.52,.61,-.22,paper);rolledMap.rotation.z=Math.PI/2;
-  for(const x of [.22,.82]){const tie=cyl(back,.069,.018,x,.61,-.22,wood);tie.rotation.z=Math.PI/2;}
   for(const x of [-1.7,1.7])rod(back,[x,.02,-.25],[x,.95,-.25],.035,dark);
   for(let i=0;i<3;i++){
     const suitcase=box(back,.66,.5,.32,2.4+i*.15,.28+i*.5,0,i%2?red:navy,.07);suitcase.rotation.y=i*.14;

@@ -15,7 +15,7 @@ export function resolveTerminalCommand(raw: string, projects: readonly string[],
   if (["exit", "logout", "desktop"].includes(command)) return { action: "exit" };
   if (command === "clear") return { action: "clear" };
   const path = command.replace(/^(?:cd|cat|open|ls)\s+/, "").replace(/^\/?(?:home\/dharmay\/)?/, "").replace(/\/$/, "").replace(/\.(?:txt|md|app)$/, "");
-  const aliases: Record<string, TerminalSection> = { "": "home", "~": "home", "/": "home", "..": "home", ls: "work", work: "resume", projects: "work", experience: "resume", education: "resume", whoami: "about", blog: "blogs", photography: "photos", email: "contact" };
+  const aliases: Record<string, TerminalSection> = { "": "home", "~": "home", "/": "home", "..": "home", ls: "work", projects: "work", experience: "resume", education: "resume", whoami: "about", blog: "blogs", photography: "photos", email: "contact" };
   if (Object.hasOwn(aliases, path)) return { route: { section: aliases[path] } };
   if ((TERMINAL_SECTIONS as readonly string[]).includes(path)) return { route: { section: path as TerminalSection } };
   const project = path.replace(/^(?:projects|work)\//, "");

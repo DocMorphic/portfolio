@@ -51,34 +51,22 @@ export function buildWorldProps(scene:THREE.Scene,materials:THREE.Material[],tex
 
   // Face fully out across the platform end, clear of the case board in front.
   const vending=new THREE.Group();vending.name="Blogs / journal vending machine";vending.position.set(...VENDING_POSITION);vending.rotation.y=VENDING_YAW;vending.scale.setScalar(1.22);scene.add(vending);
-  const enamel=mat(0x9f4d37,.27,.44),cobalt=mat(0x294951,.38,.4);
-  const trim=new THREE.MeshStandardMaterial({color:0xf1d59b,emissive:0xc48438,emissiveIntensity:.24,roughness:.45});materials.push(trim);
+  const enamel=mat(0x149ca3,.35,.25),cobalt=mat(0x2346b8,.28,.3);
+  const trim=new THREE.MeshStandardMaterial({color:0xadf7df,emissive:0x64d8c1,emissiveIntensity:.8,roughness:.3});materials.push(trim);
   for(const x of [-.48,.48])box(vending,.13,.12,.63,x,.06,0,rubber,.02);
-  box(vending,1.42,2.34,.98,0,1.25,-.035,enamel,.08);
-  box(vending,1.46,.19,1.02,0,.18,-.035,cobalt,.035);
-  box(vending,1.49,.055,1.04,0,2.46,-.015,brass,.016);
+  box(vending,1.42,2.34,.98,0,1.25,-.035,enamel,.12);
   box(vending,1.26,2.08,.08,0,1.29,.475,enamel,.065);
   box(vending,1.47,.34,1.04,0,2.32,-.015,cobalt,.09);
   box(vending,1.37,.17,.07,0,2.51,.22,enamel,.05);
   for(const x of [-.65,.65]){
     box(vending,.034,1.86,.025,x,1.37,.526,trim,.012);
-    box(vending,.21,.14,.53,x,.16,.24,cobalt,.027);
+    const foot=box(vending,.25,.22,.48,x,.19,.27,enamel,.045);foot.rotation.z=x<0?-.25:.25;
+    const footLamp=box(vending,.16,.035,.13,x,.14,.515,trim,.012);footLamp.rotation.z=x<0?-.25:.25;
     // Door hinges, flush bolts, and side cooling louvers sit on actual panels.
     for(const y of [.7,1.94])box(vending,.05,.17,.09,x,y,.51,steel,.012);
     for(let j=0;j<8;j++)box(vending,.013,.022,.32,x<0?-.718:.718,.48+j*.048,-.10,dark,.004);
-    const sideLabel=label(vending,"CHOCOLATE",.69,.26,x<0?-.72:.72,2.01,-.02,"#294951","#f8e6bb");sideLabel.rotation.y=x<0?-Math.PI/2:Math.PI/2;
+    const sideLabel=label(vending,"FRESH IDEAS",.69,.26,x<0?-.72:.72,1.56,-.02,"#137f85","#c6ffe8");sideLabel.rotation.y=x<0?-Math.PI/2:Math.PI/2;
     const stripe=box(vending,.012,.075,.83,x<0?-.719:.719,1.05,-.035,cream,.004);stripe.rotation.x=-.12;
-  }
-  // Product windows, shelves and a proper mechanical control strip make the
-  // cabinet legible as a vending machine even when its blog screen is distant.
-  const productGlass=new THREE.MeshPhysicalMaterial({color:0xe6d5af,metalness:.07,roughness:.18,transparent:true,opacity:.28,depthWrite:false,clearcoat:.7});materials.push(productGlass);
-  for(const side of [-1,1]){
-    box(vending,.018,.91,.56,side*.722,1.36,-.19,dark,.005);
-    for(let row=0;row<3;row++){
-      box(vending,.018,.025,.45,side*.735,1.06+row*.26,-.19,brass,.004);
-      for(let n=0;n<3;n++)box(vending,.028,.13,.085,side*.746,1.16+row*.26,-.37+n*.17,[red,cream,leather][(row+n)%3],.008);
-    }
-    box(vending,.012,.86,.52,side*.755,1.36,-.19,productGlass,.004).castShadow=false;
   }
   for(const x of [-.53,.45])box(vending,.075,1.38,.075,x,1.41,.525,dark,.02);
   for(const y of [.755,2.065])box(vending,1.05,.07,.075,-.04,y,.525,dark,.02);
@@ -86,17 +74,13 @@ export function buildWorldProps(scene:THREE.Scene,materials:THREE.Material[],tex
   mesh(vending,new THREE.PlaneGeometry(.9,1.26),vendingMaterial,-.04,1.41,.519);
   const vendingScreen=mesh(vending,new THREE.PlaneGeometry(.9,1.26),vendingMaterial,-.04,1.41,.533);
   vendingScreen.name="Blogs / glass interaction plane";vendingScreen.userData.dynamic=true;vendingScreen.castShadow=false;vendingScreen.visible=true;
-  const marquee=label(vending,"BLOGS",1.12,.235,0,2.32,.55,"#294951","#f9e9c5");
+  const marquee=label(vending,"BLOGS",1.12,.235,0,2.32,.55,"#2346b8","#d5fff2");
   const marqueeMaterial=new THREE.MeshStandardMaterial({map:atlasTexture,emissiveMap:atlasTexture,emissive:0xffffff,emissiveIntensity:.55,roughness:.55});materials.push(marqueeMaterial);marquee.material=marqueeMaterial;
-  label(vending,"STORIES INSIDE",.92,.075,0,2.51,.261,"#294951","#f9e9c5");
-  box(vending,.14,.66,.06,.566,1.41,.55,cobalt,.015);
-  for(let i=0;i<4;i++)box(vending,.065,.058,.018,.566,1.65-i*.13,.593,i===0?trim:cream,.009);
+  label(vending,"SOMETHING GOOD",.92,.075,0,2.51,.261,"#137f85","#d5fff2");
   box(vending,.065,.21,.04,.566,.60,.54,dark,.013);box(vending,.008,.09,.01,.566,.63,.566,brass,.002);
   box(vending,.026,.026,.012,.566,.55,.568,trim,.009);
-  box(vending,1.06,.35,.13,-.07,.43,.49,brass,.025);
-  box(vending,.91,.24,.14,-.07,.43,.558,dark,.018);
-  box(vending,.90,.05,.23,-.07,.28,.57,steel,.012);
-  label(vending,"PICK UP HERE",.76,.065,-.07,.22,.58,"#294951","#f9e9c5");
+  box(vending,.90,.25,.15,-.08,.41,.488,dark,.045);box(vending,.86,.035,.23,-.08,.28,.57,steel,.012);
+  label(vending,"STORIES TO GO",.68,.055,-.08,.24,.58,"#137f85","#c6ffe8");
   // Turn the complete TV assembly to the opposite side, with its cradle and
   // mounting shoes attached and wholly inside the same roof corner.
   const tv=new THREE.Group();tv.name="Front corner / SAD-ist television";tv.position.set(-3.35,3.4,-.15);tv.rotation.y=-.18;scene.add(tv);

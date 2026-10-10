@@ -524,16 +524,16 @@ export function TerminalApp() {
 
         case "open":
           if (!args[0]) newLines.push({ type: "error", text: "usage: open <app-id>" });
-          else if (APP_REGISTRY[args[0] === "projects" ? "works" : args[0]]) {
-            openWindow(args[0] === "projects" ? "works" : args[0]);
+          else if (APP_REGISTRY[args[0]]) {
+            openWindow(args[0]);
             newLines.push({ type: "output", text: `→ opened ${args[0]}` });
           } else newLines.push({ type: "error", text: `app not found: ${args[0]}` });
           break;
 
         case "close":
           if (!args[0]) newLines.push({ type: "error", text: "usage: close <app-id>" });
-          else if (APP_REGISTRY[args[0] === "projects" ? "works" : args[0]]) {
-            closeWindow(args[0] === "projects" ? "works" : args[0]);
+          else if (APP_REGISTRY[args[0]]) {
+            closeWindow(args[0]);
             newLines.push({ type: "output", text: `→ closed ${args[0]}` });
           } else newLines.push({ type: "error", text: `app not found: ${args[0]}` });
           break;
@@ -584,7 +584,7 @@ export function TerminalApp() {
             })
           );
           newLines.push({ type: "output", text: "" });
-          newLines.push({ type: "output", text: "Type 'open projects' to see the full timeline." });
+          newLines.push({ type: "output", text: "Type 'open works' to see the full timeline." });
           break;
 
         case "experience":

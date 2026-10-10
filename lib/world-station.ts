@@ -4,8 +4,8 @@ import type { TerminalSection } from "./portfolio-terminal";
 import { VENDING_POSITION, VENDING_YAW } from "./world-props";
 import {HOLOGRAM_PLACEMENT} from "./hologram-timing.mjs";
 
-export const SIGN_DESTINATIONS:{label:string;action:TerminalSection}[]=[{label:"work",action:"resume"},{label:"projects",action:"work"},{label:"about",action:"about"},{label:"blogs",action:"blogs"},{label:"photos",action:"photos"},{label:"contact",action:"contact"}];
-export const SIGN_SHAPES=[{width:1.2,height:1.02,roll:-.065,yaw:-.08},{width:1.03,height:.95,roll:.075,yaw:.1},{width:.95,height:.92,roll:-.045,yaw:.025},{width:.83,height:.98,roll:.095,yaw:-.11},{width:1.06,height:1.08,roll:-.055,yaw:.08},{width:1.24,height:.96,roll:.045,yaw:-.04}];
+export const SIGN_DESTINATIONS:TerminalSection[]=["work","about","blogs","photos","contact"];
+export const SIGN_SHAPES=[{width:1.2,height:1.02,roll:-.065,yaw:-.08},{width:.95,height:.92,roll:.075,yaw:.1},{width:.83,height:.98,roll:-.045,yaw:.025},{width:1.06,height:1.08,roll:.095,yaw:-.11},{width:1.24,height:.96,roll:-.055,yaw:.08}];
 export type StationAction=TerminalSection|"night"|"bell"|"hologram";
 export function createWorldStation(scene:THREE.Scene,materials:THREE.Material[],textures:THREE.Texture[]){
   const stage=new THREE.Scene(),hits:{mesh:THREE.Mesh;action:StationAction}[]=[];
@@ -20,14 +20,14 @@ export function createWorldStation(scene:THREE.Scene,materials:THREE.Material[],
   mesh(new THREE.CylinderGeometry(.23,.34,.12,8),metal,[x,.13,z]);rod([x,.15,z],[x,3.83,z],.065);
   for(const y of [.4,1.6,3.2])mesh(new THREE.TorusGeometry(.075,.021,6,16),brass,[x,y,z]).rotation.x=Math.PI/2;
   const labels:THREE.MeshBasicMaterial[]=[];
-  SIGN_DESTINATIONS.forEach(({label:signLabel,action},i)=>{
-    const y=3.06-i*.39,direction=i%2?-1:1,shape=new THREE.Shape();
+  SIGN_DESTINATIONS.forEach((action,i)=>{
+    const y=2.95-i*.43,direction=i%2?-1:1,shape=new THREE.Shape();
     const variation=SIGN_SHAPES[i],sign=new THREE.Group();sign.position.set(x,y,z+.05);sign.scale.set(variation.width,variation.height,1);sign.rotation.set(0,variation.yaw,variation.roll);stage.add(sign);
     shape.moveTo(-.72,-.16);shape.lineTo(.5,-.16);shape.lineTo(.74,0);shape.lineTo(.5,.16);shape.lineTo(-.72,.16);shape.closePath();
     const board=mesh(new THREE.ExtrudeGeometry(shape,{depth:.085,bevelEnabled:true,bevelSize:.015,bevelThickness:.012,bevelSegments:2,steps:1}),metal,[0,0,0],sign);board.scale.x=direction;
     const canvas=document.createElement("canvas");canvas.width=512;canvas.height=112;const ctx=canvas.getContext("2d")!;
-    const colors=["#88ecde","#f6d285","#ffc979","#e2adfc","#a6d897","#91caff"];
-    ctx.fillStyle=colors[i];ctx.fillRect(0,0,512,112);ctx.fillStyle="#142e3c";ctx.font="bold 58px monospace";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(signLabel,256,59);
+    const colors=["#88ecde","#ffc979","#e2adfc","#a6d897","#91caff"];
+    ctx.fillStyle=colors[i];ctx.fillRect(0,0,512,112);ctx.fillStyle="#142e3c";ctx.font="bold 58px monospace";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(action,256,59);
     const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;textures.push(texture);
     const label=new THREE.MeshBasicMaterial({map:texture,toneMapped:false});labels.push(label);materials.push(label);
     mesh(new THREE.PlaneGeometry(1.04,.25),label,[-.055*direction,0,.1],sign);

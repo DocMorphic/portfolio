@@ -82,7 +82,7 @@ export function RetroComputer() {
     onPointerDownCapture={()=>{void worldSound.unlock();}} onKeyDownCapture={()=>{void worldSound.unlock();}}
     onKeyDown={event => {if(event.key === "Escape" && view !== "overview"){event.preventDefault();event.stopPropagation();controls.current?.back();}}}>
     <div ref={host} className="retro-computer-canvas" inert={terminalReady} tabIndex={ready && !terminalReady ? 0 : -1} role="group"
-      aria-label={view === "keyboard" ? "Clickable 3D keyboard. Type TERMINAL or click its keys to enter the tram world. Escape returns." : "3D retro computer. Click the orange-lit keyboard, then type TERMINAL to enter the tram world. Drag to spin or use the wired mouse."} />
+      aria-label={view === "keyboard" ? "Clickable 3D keyboard. Eight letter keys glow: A, E, I, L, M, N, R, T. Find their sequence. Click keys or type. Escape returns." : "3D retro computer. Drag the monitor to spin, click the keyboard to zoom in, or drag the wired mouse. Escape returns."} />
     {!ready && <p className="retro-computer-fallback">{status}</p>}
     <div className="retro-computer-controls" aria-label="Mini computer controls">
       {view !== "overview" && <button type="button" onClick={() => controls.current?.back()} aria-label="Return to computer view">← Back</button>}

@@ -23,7 +23,6 @@ export function PortfolioRoom({active,sourceReady,sourceBounds,onExit,standalone
   const [view,setView]=useState<RoomView>("terminal"),viewRef=useRef<RoomView>("terminal");
   const [selection,setSelection]=useState<WorldSelection|null>(null);
   const [night,setNight]=useState(false);
-  const [controlsOpen,setControlsOpen]=useState(false);
   const closing=useRef(false);
   const animation=useRef<Animation|null>(null),finishExit=useRef<()=>void>(()=>{});
   const gate=worldOverlayGate(active,phase);
@@ -81,8 +80,6 @@ export function PortfolioRoom({active,sourceReady,sourceBounds,onExit,standalone
     animation.current.onfinish=()=>{if(!controls.current)setPhase("live");};
   },[active,sourceReady,ready,phase,standalone,sourceClip]);
   useEffect(()=>{if(ready&&phase!=="warming")routeReady("world");},[ready,phase]);
-  useEffect(()=>{if(phase==="live"&&!window.localStorage.getItem("tram-controls-seen-v1"))setControlsOpen(true);},[phase]);
-  const closeControls=()=>{window.localStorage.setItem("tram-controls-seen-v1","1");setControlsOpen(false);};
   useEffect(()=>{
     if(gate.inert)return;
     const desktop=document.querySelector<HTMLElement>(".desktop-brightness"),prior=document.activeElement as HTMLElement|null,wasInert=desktop?.inert??false;
@@ -95,21 +92,20 @@ export function PortfolioRoom({active,sourceReady,sourceBounds,onExit,standalone
   useEffect(()=>{
     if(!active||journey)return;
     const key=(e:KeyboardEvent)=>{
-      if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();if(controlsOpen){closeControls();return;}if(closing.current||phaseRef.current!=="live"){cancelExit();return;}if(controls.current)controls.current.reveal();else leave();}
+      if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();if(closing.current||phaseRef.current!=="live"){cancelExit();return;}if(controls.current)controls.current.reveal();else leave();}
       if(e.key==="Tab"){
-        const scope=controlsOpen?root.current?.querySelector(".world-controls-card"):root.current;
-        const items=Array.from(scope?.querySelectorAll<HTMLElement>('button:not(:disabled),a[href],input,textarea,[tabindex="0"]')??[]).filter(el=>!el.closest("[inert]")&&el.getClientRects().length);
+        const items=Array.from(root.current?.querySelectorAll<HTMLElement>('button:not(:disabled),a[href],input,textarea,[tabindex="0"]')??[]).filter(el=>!el.closest("[inert]")&&el.getClientRects().length);
         if(!items.length)return;const first=items[0],last=items.at(-1)!;
         if(e.shiftKey&&(document.activeElement===first||document.activeElement===root.current)){e.preventDefault();last.focus();}
         else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===root.current)){e.preventDefault();first.focus();}
       }
     };
     document.addEventListener("keydown",key,true);return()=>document.removeEventListener("keydown",key,true);
-  },[active,journey,cancelExit,leave,controlsOpen]);
+  },[active,journey,cancelExit,leave]);
   const navigate=(section:TerminalSection)=>controls.current?.visit(section,undefined,true);
   return createPortal(<div {...gate}><div ref={root} className={`portfolio-room world-${phase}`} style={{visibility:phase==="warming"?"hidden":"visible",transformOrigin:"0 0",viewTransitionName:standalone?"computer-portal":undefined}} inert={!active||!!journey} data-view={view} role="dialog" aria-modal={active&&!journey} aria-label="Hidden portfolio world" tabIndex={-1}
     onPointerDown={event=>{if((view==="tv"||view==="vending")&&event.target instanceof HTMLElement&&!event.target.closest(".world-tv-display,.world-vending-display,[data-sound-control],button,a"))controls.current?.reveal();}}
-    onKeyDown={event=>{event.stopPropagation();if(controlsOpen||view!=="room"||event.target instanceof HTMLElement&&event.target.closest("button,input,textarea,a"))return;
+    onKeyDown={event=>{event.stopPropagation();if(view!=="room"||event.target instanceof HTMLElement&&event.target.closest("button,input,textarea,a"))return;
       if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(event.key)){event.preventDefault();controls.current?.orbit(event.key==="ArrowLeft"?.085:event.key==="ArrowRight"?-.085:0,event.key==="ArrowUp"?-.085:event.key==="ArrowDown"?.085:0);}
       if(["+","=","-"].includes(event.key)){event.preventDefault();controls.current?.zoom(event.key==="-"?1:-1);}}}>
     <div ref={host} className="portfolio-room-scene"/>
@@ -124,9 +120,7 @@ export function PortfolioRoom({active,sourceReady,sourceBounds,onExit,standalone
       {ready&&<JournalVending focused={view==="vending"} onBack={()=>controls.current?.reveal()}/>}
     </div>
     {phase==="live"&&<>
-      <div className="portfolio-room-toolbar"><span className="world-place-label">DESKTOP OS <span aria-hidden="true">↔</span> TRAM WORLD</span><WorldSoundControl/><button aria-pressed={night} onClick={()=>controls.current?.setNight(!night)}>{night?"☀ Day":"☾ Night"}</button><button onClick={()=>setControlsOpen(true)}>Controls</button><button onClick={leave}>← Desktop OS</button></div>
-      {view==="room"&&!controlsOpen&&<div className="world-keyboard-guide" role="note"><span aria-hidden="true">⌨</span> Explore the tram · click its glowing computer or the signposts</div>}
-      {controlsOpen&&<div className="world-controls-scrim"><section className="world-controls-card" role="dialog" aria-modal="true" aria-labelledby="world-controls-title"><span className="world-controls-kicker">WELCOME TO THE TRAM WORLD</span><h2 id="world-controls-title">Take a look around.</h2><p>Everything here connects back to the original desktop. Explore freely, then use <strong>Desktop OS</strong> to return.</p><div className="world-controls-grid"><div><span aria-hidden="true">↔</span><b>Look around</b><small>Drag with your mouse or one finger</small></div><div><span aria-hidden="true">⌕</span><b>Move closer</b><small>Scroll, use a trackpad, or pinch</small></div><div><span aria-hidden="true">✳</span><b>Explore</b><small>Click the signposts and objects</small></div><div><span aria-hidden="true">⎋</span><b>Back out</b><small>Press Escape to return to the main view</small></div></div><button className="world-controls-start" onClick={closeControls}>Start exploring <span aria-hidden="true">→</span></button></section></div>}
+      <div className="portfolio-room-toolbar"><WorldSoundControl/><button aria-pressed={night} onClick={()=>controls.current?.setNight(!night)}>{night?"☀ Day":"☾ Night"}</button><button onClick={leave}>Exit to desktop</button></div>
       {view==="arcade"&&<div className="world-arcade-controls"><button onClick={()=>controls.current?.visit("work")}>Projects</button><button onClick={()=>controls.current?.reveal()}>← Back</button></div>}
       {view==="tv"&&<div className="world-tv-credit"><span>“Hog Hunt” by <a href="https://www.youtube.com/@SAD_istfied" target="_blank" rel="noopener noreferrer">SAD-ist</a></span><a href="https://www.youtube.com/watch?v=MPiILYNStd8" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a><button onClick={()=>controls.current?.reveal()}>Back to the lake</button></div>}
       {view==="object"&&selection&&<section className="world-story" aria-label={`${selection.section} portfolio`}>

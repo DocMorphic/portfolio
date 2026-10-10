@@ -64,8 +64,7 @@ export function buildRetroComputer({keyFeedback=true}:{keyFeedback?:boolean}={})
   box(disk, 0.23, 0.008, 0.012, -0.05, 0.029, 0.13, edge, 0.002);
 
   const keyboard = new THREE.Group(); rig.add(keyboard); keyboard.position.set(-0.1, 0.09, 1.4); keyboard.rotation.x = 0.08;
-  const keyboardBody=box(keyboard, 2.46, 0.13, 0.95, 0, 0, 0, cream, 0.06);
-  collisionBodies.push(keyboardBody);
+  collisionBodies.push(box(keyboard, 2.46, 0.13, 0.95, 0, 0, 0, cream, 0.06));
   box(keyboard, 2.28, 0.03, 0.8, 0, 0.075, -0.015, edge, 0.025);
   const legends = [...new Set(keyboardRows.flat())];
   const atlas = document.createElement("canvas");atlas.width=1024;atlas.height=1024;
