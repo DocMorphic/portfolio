@@ -297,9 +297,8 @@ export function useWindowManagerProvider(): WindowManagerContextValue {
           };
         }
 
-        // Toggle on — remember current bounds, fill the desktop. We do NOT
-        // subtract topReserve here because the point of maximize on mobile
-        // is to cover the icon row (dock is still visible at the bottom).
+        // Toggle on — remember current bounds and fill the usable desktop.
+        // Phone windows still leave the shortcut strip and dock visible.
         const fitted=fitDesktopWindow(w,viewportBounds(),true);
         return {
           ...w,

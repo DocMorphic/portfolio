@@ -3,7 +3,9 @@ export type WindowBounds={position:{x:number;y:number};size:{width:number;height
 export function desktopArea(v:ViewportBounds){
   const mobile=v.width<768,margin=mobile?6:12;
   const menu=(mobile?44:34)+(v.top??0),dock=(mobile?76:72)+(v.bottom??0);
-  const reserve=mobile&&v.height>=800?84:0;
+  // The shortcut strip is ~96px tall. Keep it clear on every phone height,
+  // including landscape and when the on-screen keyboard shrinks the viewport.
+  const reserve=mobile?100:0;
   const x=margin+(v.left??0),y=margin+reserve;
   return {x,y,width:Math.max(1,v.width-x-margin-(v.right??0)),height:Math.max(1,v.height-menu-dock-y-margin),mobile,menu,dock};
 }
