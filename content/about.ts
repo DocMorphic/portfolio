@@ -4,13 +4,13 @@ export const aboutData = {
   title: "CS Student & Full-Stack Developer",
   location: "Munich, Germany",
   intro: [
-    "hi :) I’m a CS student at TUM, starting my bachelor’s in October. I currently intern at Lyceum, working on serverless inference and GPUs.",
+    "hi :) I’m a first-year CS student at TUM, Venture Fellow at Creator Fund, Campus Lead at OpenAI, and an engineering intern at Lyceum.",
     "A little about me: I’m really athletic, I love video games, playing AND making them, and I’ve got good taste.",
   ],
   currentFocus: [
+    "Scouting promising student founders at Creator Fund.",
     "Engineering serverless inference and GPU infrastructure at Lyceum.",
-    "Starting BSc Computer Science at TU Munich in Oct 2026.",
-    "Building Framed, a PvP game played through OS windows.",
+    "OpenAI Student Collective Campus Lead for TUM.",
   ],
   socials: {
     github: "https://github.com/DocMorphic",

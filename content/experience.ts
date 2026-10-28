@@ -1,15 +1,42 @@
 import type { ExperienceEntry } from "@/lib/types";
 
 export const currentFocus: string[] = [
+  "Venture Fellow at Creator Fund — scouting promising student founders at TUM.",
   "Software Engineering Intern at Lyceum — serverless inference & GPU VMs at scale.",
-  "Incoming BSc Computer Science student at TU Munich, starting Oct 2026.",
+  "OpenAI Student Collective Campus Lead for TUM — student events and workshops.",
+  "First-year BSc Computer Science student at TU Munich.",
   "Building Framed — a PvP game where the OS's own windows are the arena.",
 ];
 
 export const experience: ExperienceEntry[] = [
   {
+    id: "creator-fund",
+    company: "Creator Fund",
+    companyUrl: "https://thecreatorfund.com/",
+    role: "Venture Fellow",
+    location: "Munich, Germany",
+    startDate: "Oct 2026",
+    endDate: "Present",
+    description:
+      "Learning how to invest in exceptional people and scouting students at my university who are building promising projects.",
+    tags: ["Venture Capital", "Student Founders", "TU Munich"],
+  },
+  {
+    id: "openai",
+    company: "OpenAI",
+    companyUrl: "https://openai.com/",
+    role: "Campus Lead",
+    location: "Munich, Germany",
+    startDate: "Oct 2026",
+    endDate: "Present",
+    description:
+      "OpenAI Student Collective Campus Lead for TUM. Helping students build with AI and hosting events and workshops to help them work with OpenAI tools.",
+    tags: ["OpenAI", "Student Collective", "Workshops", "TU Munich"],
+  },
+  {
     id: "lyceum",
     company: "Lyceum",
+    companyUrl: "https://lyceum.technology/",
     role: "Software Engineering Intern",
     employmentType: "Internship",
     location: "Munich, Germany",
@@ -23,6 +50,7 @@ export const experience: ExperienceEntry[] = [
   {
     id: "clar-ai",
     company: "Clar AI",
+    companyUrl: "https://www.clar.ai/",
     role: "Software Engineering Intern",
     employmentType: "Internship",
     location: "Munich, Germany",
@@ -36,6 +64,7 @@ export const experience: ExperienceEntry[] = [
   {
     id: "scaile",
     company: "SCAILE",
+    companyUrl: "https://www.scaile.tech/",
     role: "Software Engineering Intern",
     employmentType: "Internship",
     location: "Munich, Germany",
@@ -49,7 +78,7 @@ export const experience: ExperienceEntry[] = [
   {
     id: "freelance",
     company: "Independent",
-    role: "Freelance Web Dev",
+    role: "Fullstack Engineering Freelancer",
     employmentType: "Freelance",
     location: "India & Germany",
     locationType: "Remote",
@@ -91,11 +120,11 @@ export const education: ExperienceEntry[] = [
     id: "tum-bsc",
     company: "Technical University of Munich",
     role: "BSc Computer Science",
-    employmentType: "Incoming Student",
+    employmentType: "Student",
     location: "Munich, Germany",
     startDate: "Oct 2026",
     endDate: "Aug 2028",
-    description: "Incoming first-semester student in the Computer Science bachelor's program.",
+    description: "First-year student in the Computer Science bachelor's program.",
     tags: ["Computer Science", "TU Munich"],
   },
   {

@@ -20,7 +20,7 @@ const completions = [...TERMINAL_SECTIONS, ...projectIds, ...folderIds, "help", 
 function Timeline({ entries }: { entries: ExperienceEntry[] }) {
   return <div className="ct-timeline">{entries.map(entry => <article key={entry.id}>
     <span className="ct-meta">{entry.startDate} — {entry.endDate}</span>
-    <h3>{entry.role}</h3><p className="ct-accent">{entry.company}</p>
+    <h3>{entry.role}</h3><p className="ct-accent">{entry.companyUrl ? <a href={entry.companyUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{entry.company}</a> : entry.company}</p>
     <p>{entry.description}</p><div className="ct-tags">{entry.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
   </article>)}</div>;
 }

@@ -63,6 +63,7 @@ export interface Project {
 export interface ExperienceEntry {
   id: string;
   company: string;
+  companyUrl?: string;
   role: string;
   employmentType?: string;
   location?: string;

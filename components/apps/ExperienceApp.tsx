@@ -116,7 +116,11 @@ function TimelineEntry({ entry }: { entry: ExperienceEntry }) {
             {entry.role}
           </span>
           <span className="text-[12.5px]" style={{ color: "var(--color-text-muted)" }}>
-            {entry.company}
+            {entry.companyUrl ? (
+              <a href={entry.companyUrl} target="_blank" rel="noopener noreferrer" className="underline decoration-current/50 underline-offset-2 hover:decoration-current focus-visible:outline-2 focus-visible:outline-offset-2">
+                {entry.company}
+              </a>
+            ) : entry.company}
           </span>
           {entry.employmentType && (
             <span className="text-[11.5px]" style={{ color: "var(--color-text-dim)" }}>
