@@ -79,5 +79,6 @@ export const projects: Project[] = [
     startDate: "Jun 2026",
     endDate: "Jun 2026",
     github: "https://github.com/DocMorphic/pyra",
+    link: "https://pyra-1.vercel.app/",
   },
 ];
